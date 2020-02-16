@@ -9,9 +9,6 @@ entries=[]
 main = Frame(window)
 main.pack()
 def solve(s):
-    print(s)
-    for i in range(9):
-        print(solveSudoku(s)[i])
     outputSudoku(solveSudoku(s))
 def outputSudoku(s):
 

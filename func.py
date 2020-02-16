@@ -1,11 +1,32 @@
 import math
+import time
+sudoku=[[-1, 1, -1, 5, -1, -1, 3, -1, -1], [-1, -1, 2, 8, -1, -1, -1, -1, -1], [-1, -1, 3, -1, -1, -1, 1, 9, -1], [-1, 2, -1, -1, -1, 9, -1, 1, -1], [6, 4, -1, -1, -1, -1, -1, 5, -1], [5, -1, -1, -1, -1, 1, -1, 2, -1], [-1, -1, -1, -1, 7, -1, -1, -1, 6], [-1, -1, -1, -1, 6, 2, -1, -1, 7], [-1, 9, -1, -1, -1, -1, -1, -1, -1]]
 
+
+def getEmptyRowCells(r,s):
+    n=0
+    for i in range(9):
+        if(s[r][i]==-1):
+            n+=1
+    return n
+def getEmptyColCells(c,s):
+    n=0
+    for i in range(9):
+        if(s[i][c]==-1):
+            n+=1
+    return n
+def getEmptyBlockCells(br,bc,s):
+    n=0
+    for i in range(3): # i is row here
+        for j in range(3): # j is column here
+            if(s[i+br*3][j+bc*3]==-1):
+                n+=1
+    return n
 def getEmtpyCells(s):
     count = 0
     for x in range(9):
         count = count + s[x].count(-1)
     return count
-
 
 def getBlock(r, c):
     block = [math.floor(r / 3), math.floor(c / 3)]
@@ -33,7 +54,10 @@ def checkBlockNum(br, bc, n, s):
     for j in range(3):
         for k in range(3):
             if (numberPossible(j + br * 3, k + 3 * bc, n, s)):
-                poss.append([j + br * 3, k + 3 * bc])
+                if (len(numPossibleRow(bc, n, s)[br]) == 1 and k not in numPossibleRow(bc, n, s)[br]):
+                    continue
+                else:
+                    poss.append([j + br * 3, k + 3 * bc])
     return poss
 
 
@@ -75,7 +99,29 @@ def possibleNums(r, c, s):
                 poss.remove(i)
     return poss
 
+def numPossibleRow(bc,n,s):
+    col = []
+    for i in range(3):  # Block being checked in bc
+        col.append([])
+        for j in range(3):  # Row in block checked
+            for k in range(3):  # Column in block checked
+                if (numberPossible(j + i * 3, k + bc * 3, n, s) and k not in col[i]):
+                    col[i].append(k)
+    c = 0
+    z = 0
+    while True:
+        for i in range(3):
+            if (len(col[i]) == 1):
+                for j in range(3):
+                    if j != i and col[i][0] in col[j]:
+                        col[j].remove(col[i][0])
+                        c += 1
+        z += 1
+        if (z == 3):
+            break
+    return col
 def solveSudoku(s):
+    start_time= time.time()
     z = 0
     while True:
         changes = 0
@@ -108,4 +154,6 @@ def solveSudoku(s):
             break
         else:
             continue
+    print("--- %s seconds to solve ---" % (time.time() - start_time))
     return s
+solveSudoku(sudoku)
