@@ -1,6 +1,7 @@
 import math
 import time
 
+#sudoku=[[2, 7, -1, -1, -1, -1, -1, 8, -1], [4, 1, -1, -1, -1, 5, -1, -1, -1], [-1, -1, -1, 7, 3, -1, 1, -1, 2], [-1, -1, -1, 6, 1, 3, -1, 2, 9], [-1, -1, -1, -1, -1, -1, 5, -1, -1], [3, -1, 1, 5, -1, -1, -1, -1, -1], [6, -1, -1, -1, 7, -1, 3, -1, -1], [5, 3, 7, 4, -1, -1, 2, -1, -1], [1, 9, 8, 3, 5, 2, 4, 6, 7]]
 def getEmptyRowCells(r,s):
     n=0
     for i in range(9):
@@ -49,11 +50,12 @@ def numberPossible(r, c, n, s):
 
 def checkBlockNum(br, bc, n, s):
     poss = []
-    for j in range(3):
-        for k in range(3):
+    for j in range(3): # Row being checked
+        for k in range(3): # Col being checked
             if (numberPossible(j + br * 3, k + 3 * bc, n, s)):
-                if (len(numPossibleRow(bc, n, s)[br]) == 1 and k not in numPossibleRow(bc, n, s)[br]):
-                    continue
+                if ((len(numPossibleCol(bc, n, s)[br]) == 1 and k not in numPossibleCol(bc, n, s)[br])):
+                    if len(numPossibleRow(br,n,s)[bc])==1 and j not in numPossibleRow(br,n,s)[bc]:
+                        continue
                 else:
                     poss.append([j + br * 3, k + 3 * bc])
     return poss
@@ -97,7 +99,7 @@ def possibleNums(r, c, s):
                 poss.remove(i)
     return poss
 
-def numPossibleRow(bc,n,s):
+def numPossibleCol(bc,n,s):
     col = []
     for i in range(3):  # Block being checked in bc
         col.append([])
@@ -114,10 +116,49 @@ def numPossibleRow(bc,n,s):
                     if j != i and col[i][0] in col[j]:
                         col[j].remove(col[i][0])
                         c += 1
+        if (len(col[i]) == 2):
+            for i in range(3):
+                for j in range(3):
+                    for k in range(3):
+                        if j != i and col[i] == col[j] and k != j and k != i:
+                            for l in col[i]:
+                                if l in col[k]:
+                                    col[k].remove(l)
+                                    c += 1
         z += 1
         if (z == 3):
             break
     return col
+def numPossibleRow(br,n,s):
+    row = []
+    for i in range(3):  # Block being checked in br
+        row.append([])
+        for j in range(3):  # Column in block checked
+            for k in range(3):  # Row in block checked
+                if (numberPossible(k+br*3,j+i*3,n,s) and k not in row[i]):
+                    row[i].append(k)
+    c = 0
+    z = 0
+    while True:
+        for i in range(3):
+            if (len(row[i]) == 1):
+                for j in range(3):
+                    if j != i and row[i][0] in row[j]:
+                        row[j].remove(row[i][0])
+                        c += 1
+            if (len(row[i]) == 2):
+                for i in range(3):
+                    for j in range(3):
+                        for k in range(3):
+                            if j!=i and row[i]==row[j] and k!=j and k!=i:
+                                for l in row[i]:
+                                    if l in row[k]:
+                                        row[k].remove(l)
+                                        c+=1
+        z += 1
+        if (z == 3):
+            break
+    return row
 def solveSudoku(s):
     start_time= time.time()
     z = 0
@@ -153,4 +194,6 @@ def solveSudoku(s):
         else:
             continue
     print("--- %s seconds to solve ---" % (time.time() - start_time))
+    #for i in range(9):
+    #    print(sudoku[i])
     return s
