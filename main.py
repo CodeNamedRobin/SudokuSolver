@@ -9,13 +9,18 @@ entries=[]
 main = Frame(window)
 main.pack()
 def solve(s):
-    #print(s)
+    print(s)
     outputSudoku(solveSudoku(s))
 def outputSudoku(s):
-
     for i in range(9):
         for j in range(9):
-            if s[i][j]==-1:
+            if isinstance(s[i][j], list):
+                text = ""
+                for k in s[i][j]:
+                    text += str(k)
+                Label(main, text=text, font=("Arial", 18), image=PhotoImage(), height=100, width=100, bd=1,
+                      compound='center', relief='solid').grid(column=j, row=i)
+            elif s[i][j] == -1:
                 Label(main, text=" ", font=("Arial", 35), image=PhotoImage(), height=100, width=100, bd=1,
                       compound='center', relief='solid').grid(column=j, row=i)
             else:

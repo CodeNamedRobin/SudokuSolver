@@ -1,7 +1,7 @@
 import math
 import time
 
-#sudoku=[[2, 7, -1, -1, -1, -1, -1, 8, -1], [4, 1, -1, -1, -1, 5, -1, -1, -1], [-1, -1, -1, 7, 3, -1, 1, -1, 2], [-1, -1, -1, 6, 1, 3, -1, 2, 9], [-1, -1, -1, -1, -1, -1, 5, -1, -1], [3, -1, 1, 5, -1, -1, -1, -1, -1], [6, -1, -1, -1, 7, -1, 3, -1, -1], [5, 3, 7, 4, -1, -1, 2, -1, -1], [1, 9, 8, 3, 5, 2, 4, 6, 7]]
+sudoku=[[4, -1, -1, 5, 7, 1, -1, 8, 9], [-1, 9, 5, 8, 6, 2, 4, -1, -1], [8, -1, -1, 9, 4, 3, -1, 2, 5], [1, 8, 3, 4, 9, 7, 5, 6, 2], [9, 5, 4, 2, 1, 6, 8, 7, 3], [2, -1, -1, 3, 5, 8, 1, 9, 4], [6, -1, -1, 1, 3, 5, -1, 4, 8], [-1, -1, -1, 6, 8, -1, 2, 5, -1], [5, -1, 8, 7, 2, -1, -1, -1, 6]]
 def getEmptyRowCells(r,s):
     n=0
     for i in range(9):
@@ -97,6 +97,34 @@ def possibleNums(r, c, s):
         if (len(checkBlockNum(block[0], block[1], i, s)) == 0):
             if (i in poss):
                 poss.remove(i)
+    # check x-wing
+    chickenWings=[]
+
+    #Finds if it's a corner of an X-Wing and stores it in chickenWings
+    for i in range(1,10):
+        if(not checkXWing(r,c,i,s)):
+            continue
+        if(checkXWing(r,c,i,s)[0]==r and checkXWing(r,c,i,s)[1]==c):
+            chickenWings.append(i)
+    #Finds X-Wings intersecting our cell for the particular number
+    if len(poss)==1:
+        return poss
+    for i in range(1,10):
+        if i in chickenWings:
+            continue
+        for j in range(9):  # Check row for corners of an x-wing,j=col
+            if j==c:
+                continue
+            if(checkXWing(r,j,i,s)!=False):
+                if i in poss:
+                    poss.remove(i)
+        for j in range(9):  # Check column for corners of an x-wing,j=row
+            if j==r:
+                continue
+            if(checkXWing(j,c,i,s)!=False):
+                if i in poss:
+                    poss.remove(i)
+
     return poss
 
 def numPossibleCol(bc,n,s):
@@ -159,6 +187,31 @@ def numPossibleRow(br,n,s):
         if (z == 3):
             break
     return row
+
+
+#  Function Should return 2 coordinate pairs, of the top-left and bottom-right corner of the X-wing
+def checkXWing(r,c,n,s):
+    if(s[r][c]!=-1):
+        return False
+    if(not numberPossible(r,c,n,s)):
+        return False
+    rowPos= checkRowNum(r,n,s)
+    colPos= checkColNum(c,n,s)
+    for i in rowPos:
+        if (r,i[1])==-1:
+            continue
+        if(i[1]==c):
+            continue
+        #if (getBlock(r, i[1]) == getBlock(r, c)):
+        #   continue
+        for j in colPos:
+            if (j[0] == r):
+                continue
+            if(s[j[0]][i[1]]!=-1):
+                continue
+            if(numberPossible(j[0],i[1],n,s)):
+                return [r,c,j[0],i[1]]
+    return False
 def solveSudoku(s):
     start_time= time.time()
     z = 0
@@ -190,10 +243,17 @@ def solveSudoku(s):
         else:
             continue
         if z == 10:
+
+            # AFTER THIS POINT DON'T USE CODE ABOVE
+            for i in range(9):
+                for j in range(9):
+                    if (s[i][j] == -1):
+                        s[i][j] = possibleNums(i, j, s)
             break
         else:
             continue
     print("--- %s seconds to solve ---" % (time.time() - start_time))
-    #for i in range(9):
-    #    print(sudoku[i])
+
+    for i in range(9):
+        print(s[i])
     return s
