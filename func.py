@@ -223,6 +223,29 @@ def checkXWing(r,c,n,sudoku):
             if(numberPossible(j[0],i[1],n,s)):
                 return [r,c,j[0],i[1]]
     return False
+
+def checkYWing(r,c,s):
+    #Checks if the pivot has 2 candidates
+    if(len(possibleNums(r,c,s))==2):
+        return True
+    #Finds the pincers
+
+    return []
+def checkPointingPair(r,c,n,s):
+    #Find row pointing pairs
+    if (len(checkRowNum(r, n, s)) == 2):
+        if (getBlock(checkRowNum(r, n, s)[0][0], checkRowNum(r, n, s)[0][1]) == getBlock(
+            checkRowNum(r, n, s)[1][0], checkRowNum(r, n, s)[1][1])):
+            print("Blocks are same")
+            return checkRowNum(r,n,s)
+
+    if (len(checkRowNum(r, n, s)) == 3):
+        if (getBlock(checkRowNum(r, n, s)[0][0], checkRowNum(r, n, s)[0][1]) == getBlock(
+                checkRowNum(r, n, s)[1][0], checkRowNum(r, n, s)[1][1]) and getBlock(
+            checkRowNum(r, n, s)[0][0], checkRowNum(r, n, s)[0][1]) == getBlock(
+            checkRowNum(r, n, s)[2][0], checkRowNum(r, n, s)[2][1])):
+            print("Blocks are same")
+            return checkRowNum(r, n, s)
 def solveSudoku(s):
     start_time= time.time()
     z = 0
@@ -262,11 +285,6 @@ def solveSudoku(s):
             continue
     print("--- %s seconds to solve ---" % (time.time() - start_time))
     possNumTable=[[possibleNums(a,b,s) if(s[a][b])==-1 else [] for b in range(9)] for a in range(9)]
-    '''for a in range(9):
-        for b in range(9):
-            print(possibleNums(7, 1, s), [a,b])
-            if (s[a][b] == -1):
-                s[a][b] = possibleNums(a, b, s)'''
 
     for x in range(9):
         for z in range(9):
@@ -275,4 +293,7 @@ def solveSudoku(s):
     for i in range(9):
         print(s[i])
     return s
-solveSudoku(sudoku)
+'''wings=[[checkYWing(i,j,sudoku) if sudoku[i][j]==-1 else [] for j in range(9)] for i in range(9)]
+for i in range(9):
+    print(wings[i])'''
+
