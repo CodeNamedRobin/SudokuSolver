@@ -2,6 +2,7 @@ from tkinter import *
 from func import *
 window = Tk()
 sudoku2=[]
+sudoku=[[4, -1, -1, 5, 7, 1, -1, 8, 9], [-1, 9, 5, 8, 6, 2, 4, -1, -1], [8, -1, -1, 9, 4, 3, -1, 2, 5], [1, 8, 3, 4, 9, 7, 5, 6, 2], [9, 5, 4, 2, 1, 6, 8, 7, 3], [2, -1, -1, 3, 5, 8, 1, 9, 4], [6, -1, -1, 1, 3, 5, -1, 4, 8], [-1, -1, -1, 6, 8, -1, 2, 5, -1], [5, -1, 8, 7, 2, -1, -1, -1, 6]]
 window.title("Sudoku Solver")
 size=966
 window.geometry(str(size) + "x" + str(size))
@@ -9,7 +10,6 @@ entries=[]
 main = Frame(window)
 main.pack()
 def solve(s):
-    print(s)
     outputSudoku(solveSudoku(s))
 def outputSudoku(s):
     for i in range(9):
@@ -46,7 +46,7 @@ def emptyScreenInput():
 
 
 
-emptyScreenInput()
-
+#emptyScreenInput()
+solve(sudoku)
 
 window.mainloop()

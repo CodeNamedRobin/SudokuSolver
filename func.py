@@ -190,25 +190,36 @@ def numPossibleRow(br,n,s):
 
 
 #  Function Should return 2 coordinate pairs, of the top-left and bottom-right corner of the X-wing
-def checkXWing(r,c,n,s):
+def checkXWing(r,c,n,sudoku):
+    s=sudoku
     if(s[r][c]!=-1):
         return False
     if(not numberPossible(r,c,n,s)):
         return False
     rowPos= checkRowNum(r,n,s)
     colPos= checkColNum(c,n,s)
-    for i in rowPos:
-        if (r,i[1])==-1:
-            continue
+    if(len(rowPos)!=2 and len(colPos) != 2):
+        return False
+    for i in rowPos: # i is thus possible columns for the X-Wing
         if(i[1]==c):
             continue
-        #if (getBlock(r, i[1]) == getBlock(r, c)):
-        #   continue
-        for j in colPos:
+        for j in colPos: #j is thus possible rows for the X-wing, thus corner will be in the form of j[0]i[1]
             if (j[0] == r):
                 continue
             if(s[j[0]][i[1]]!=-1):
                 continue
+            if(len(rowPos)==2 and len(colPos)==2):
+                #print("Code 0")
+                if (len(checkRowNum(j[0], n, s)) != 2 and len(checkColNum(i[1],n,s))!=2):
+                    continue
+            elif(len(rowPos)==2):
+                #print("Code 1")
+                if(len(checkRowNum(j[0],n,s))!=2):
+                    continue
+            elif(len(colPos)==2):
+                #print("Code 2")
+                if(len(checkColNum(i[1],n,s))!=2):
+                    continue
             if(numberPossible(j[0],i[1],n,s)):
                 return [r,c,j[0],i[1]]
     return False
@@ -244,16 +255,24 @@ def solveSudoku(s):
             continue
         if z == 10:
 
+            print(s[7][1] == -1)
             # AFTER THIS POINT DON'T USE CODE ABOVE
-            for i in range(9):
-                for j in range(9):
-                    if (s[i][j] == -1):
-                        s[i][j] = possibleNums(i, j, s)
             break
         else:
             continue
     print("--- %s seconds to solve ---" % (time.time() - start_time))
+    possNumTable=[[possibleNums(a,b,s) if(s[a][b])==-1 else [] for b in range(9)] for a in range(9)]
+    '''for a in range(9):
+        for b in range(9):
+            print(possibleNums(7, 1, s), [a,b])
+            if (s[a][b] == -1):
+                s[a][b] = possibleNums(a, b, s)'''
 
+    for x in range(9):
+        for z in range(9):
+            if(s[x][z]==-1):
+                s[x][z]=possNumTable[x][z]
     for i in range(9):
         print(s[i])
     return s
+solveSudoku(sudoku)
