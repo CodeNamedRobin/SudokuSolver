@@ -124,6 +124,23 @@ def possibleNums(r, c, s):
             if(checkXWing(j,c,i,s)!=False):
                 if i in poss:
                     poss.remove(i)
+    #Find pairs/triplets on current cell
+    pairs=[]
+    for i in range(1,10):
+        if(checkPointingPair(r,c,i,s)!=False):
+            pairs.append(i)
+    #Handles the pointing pairs/triplets
+    for i in range(3):  # row
+        for j in range(3):  # column
+            for k in range(1, 10):  # number
+                row = getBlock(r, c)[0]*3+i
+                col = getBlock(r, c)[1]*3+j
+                if(row==r and col==c):
+                    continue
+                if k in pairs:
+                    continue
+                if(checkPointingPair(row,col,k,s)!=False and k in poss):
+                    poss.remove(k)
 
     return poss
 
@@ -232,11 +249,14 @@ def checkYWing(r,c,s):
 
     return []
 def checkPointingPair(r,c,n,s):
+    if(s[r][c]!=-1):
+        return False
+    if(numberPossible(r,c,n,s)!=True):
+        return False
     #Find row pointing pairs
     if (len(checkRowNum(r, n, s)) == 2):
         if (getBlock(checkRowNum(r, n, s)[0][0], checkRowNum(r, n, s)[0][1]) == getBlock(
             checkRowNum(r, n, s)[1][0], checkRowNum(r, n, s)[1][1])):
-            print("Blocks are same")
             return checkRowNum(r,n,s)
 
     if (len(checkRowNum(r, n, s)) == 3):
@@ -244,8 +264,20 @@ def checkPointingPair(r,c,n,s):
                 checkRowNum(r, n, s)[1][0], checkRowNum(r, n, s)[1][1]) and getBlock(
             checkRowNum(r, n, s)[0][0], checkRowNum(r, n, s)[0][1]) == getBlock(
             checkRowNum(r, n, s)[2][0], checkRowNum(r, n, s)[2][1])):
-            print("Blocks are same")
             return checkRowNum(r, n, s)
+    #Find column pointing pairs
+    if (len(checkColNum(c, n, s)) == 2):
+        if (getBlock(checkColNum(c, n, s)[0][0], checkColNum(c, n, s)[0][1]) == getBlock(
+            checkColNum(c, n, s)[1][0], checkColNum(c, n, s)[1][1])):
+            return checkColNum(c, n, s)
+
+    if (len(checkColNum(c, n, s)) == 3):
+        if (getBlock(checkColNum(c, n, s)[0][0], checkColNum(c, n, s)[0][1]) == getBlock(
+                checkColNum(c, n, s)[1][0], checkColNum(c, n, s)[1][1]) and getBlock(
+            checkColNum(c, n, s)[0][0], checkColNum(c, n, s)[0][1]) == getBlock(
+            checkColNum(c, n, s)[2][0], checkColNum(c, n, s)[2][1])):
+            return checkColNum(c, n, s)
+    return False
 def solveSudoku(s):
     start_time= time.time()
     z = 0
@@ -296,4 +328,3 @@ def solveSudoku(s):
 '''wings=[[checkYWing(i,j,sudoku) if sudoku[i][j]==-1 else [] for j in range(9)] for i in range(9)]
 for i in range(9):
     print(wings[i])'''
-
