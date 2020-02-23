@@ -141,7 +141,7 @@ def possibleNums(r, c, s):
                     continue
                 if(checkPointingPair(row,col,k,s)!=False and k in poss):
                     poss.remove(k)
-
+    # TODO Implement Y-Wing detection to remove candidates
     return poss
 
 def numPossibleCol(bc,n,s):
@@ -243,11 +243,62 @@ def checkXWing(r,c,n,sudoku):
 
 def checkYWing(r,c,s):
     #Checks if the pivot has 2 candidates
-    if(len(possibleNums(r,c,s))==2):
-        return True
+    if(len(possibleNums(r,c,s))!=2 or s[r][c]!=-1):
+        return False
+    candidates=possibleNums(r,c,s)
     #Finds the pincers
-
-    return []
+    pincerCandidates=[]
+    for i in range(9):  #Check row for 2-candidate cells with one common candidate
+        if(len(possibleNums(r,i,s))!=2 or s[r][i]!=-1 or i==c or (possibleNums(r,i,s)[0] in candidates and possibleNums(r,i,s)[1] in candidates) or (possibleNums(r,i,s)[0]  not in candidates and possibleNums(r,i,s)[1] not in candidates)):
+            continue
+        pincerCandidates.append([r,i])
+    for i in range(9):  #Check column for 2-candidate cells with one common candidate
+        if (len(possibleNums(i, c, s)) != 2 or s[i][c] != -1 or i == r or (
+                possibleNums(i, c, s)[0] in candidates and possibleNums(i, c, s)[1] in candidates) or (possibleNums(i,c,s)[0]  not in candidates and possibleNums(i,c,s)[1] not in candidates)):
+            continue
+        pincerCandidates.append([i,c])
+    for i in range(3):
+        for j in range(3):
+            row = getBlock(r, c)[0] * 3 + i
+            col = getBlock(r, c)[1] * 3 + j
+            if (len(possibleNums(row,col, s)) != 2 or s[row][col] != -1 or (row==r and col==c) or (
+                    possibleNums(row,col, s)[0] in candidates and possibleNums(row,col, s)[1] in candidates) or (possibleNums(row,col,s)[0]  not in candidates and possibleNums(row,col,s)[1] not in candidates)):
+                continue
+            pincerCandidates.append([row,col])
+    for i in range(len(pincerCandidates)):
+        for j in range(len(pincerCandidates)):
+            if i==j:
+                continue
+            if s[pincerCandidates[i][0]][pincerCandidates[i][1]]!=-1:
+                continue
+            if s[pincerCandidates[j][0]][pincerCandidates[j][1]]!=-1:
+                continue
+            cand=candidates
+            candI=possibleNums(pincerCandidates[i][0],pincerCandidates[i][1],s)
+            candJ=possibleNums(pincerCandidates[j][0],pincerCandidates[j][1],s)
+            common=[]
+            for x in candI:
+                if x in candJ and x not in common:
+                    common.append(x)
+            if(len(common)==0):
+                continue
+            if(getBlock(pincerCandidates[i][0],pincerCandidates[i][1])==getBlock(pincerCandidates[j][0],pincerCandidates[j][1]) or pincerCandidates[i][0]==pincerCandidates[j][0] or pincerCandidates[i][1]==pincerCandidates[j][1]):
+                continue
+            if(possibleNums(pincerCandidates[i][0],pincerCandidates[i][1],s)[0] in cand):
+                cand.remove(possibleNums(pincerCandidates[i][0],pincerCandidates[i][1],s)[0])
+                if(len(cand)==0):
+                    continue
+                if(cand[0] in possibleNums(pincerCandidates[j][0], pincerCandidates[j][1],s)):
+                    if(len(common)==1 and common[0] not in candidates):
+                        return [[r,c], pincerCandidates[i], pincerCandidates[j]]
+            if(possibleNums(pincerCandidates[i][0],pincerCandidates[i][1],s)[1] in cand):
+                cand.remove(possibleNums(pincerCandidates[i][0],pincerCandidates[i][1],s)[1])
+                if (len(cand) == 0):
+                    continue
+                if(cand[0] in possibleNums(pincerCandidates[j][0], pincerCandidates[j][1],s)):
+                    if(len(common)==1 and common[0] not in candidates):
+                        return [[r,c], pincerCandidates[i], pincerCandidates[j]]
+    return False
 def checkPointingPair(r,c,n,s):
     if(s[r][c]!=-1):
         return False
@@ -325,6 +376,7 @@ def solveSudoku(s):
     for i in range(9):
         print(s[i])
     return s
-'''wings=[[checkYWing(i,j,sudoku) if sudoku[i][j]==-1 else [] for j in range(9)] for i in range(9)]
+'''wings=[[True if sudoku[i][j]==-1 and checkYWing(i,j,sudoku)!=False else False for j in range(9)] for i in range(9)]
 for i in range(9):
     print(wings[i])'''
+print(checkYWing(8,1,sudoku))
